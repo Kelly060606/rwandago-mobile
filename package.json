@@ -4,11 +4,16 @@
   "main": "index.ts",
   "dependencies": {
     "@expo/vector-icons": "^15.1.1",
+    "@react-navigation/bottom-tabs": "^7.18.18",
+    "@react-navigation/native": "^7.3.18",
+    "@react-navigation/stack": "^7.10.24",
     "expo": "~57.0.16",
     "expo-status-bar": "~57.0.1",
     "react": "19.2.3",
     "react-dom": "19.2.3",
     "react-native": "0.86.2",
+    "react-native-gesture-handler": "^3.2.1",
+    "react-native-safe-area-context": "^5.9.1",
     "react-native-web": "^0.21.2"
   },
   "devDependencies": {
