@@ -18,7 +18,7 @@ const OnboardingScreen: React.FC<OnboardingScreenProps> = ({ navigation }) => {
     if (currentStep < 3) {
       setCurrentStep(currentStep + 1);
     } else {
-      navigation.replace('Login');
+      navigation.replace('SignUp');
     }
   };
 

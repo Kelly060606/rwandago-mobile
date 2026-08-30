@@ -24,9 +24,12 @@ export default function Button({ title, onPress, loading = false, fullWidth = fa
 const styles = StyleSheet.create({
   button: {
     alignItems: 'center',
-    backgroundColor: '#1E90FF',
-    borderRadius: 8,
-    padding: 12,
+    backgroundColor: '#191919',
+    borderRadius: 28,
+    minHeight: 52,
+    justifyContent: 'center',
+    paddingHorizontal: 18,
+    paddingVertical: 12,
   },
   fullWidth: {
     width: '100%',

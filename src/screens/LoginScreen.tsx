@@ -18,7 +18,7 @@ export default function LoginScreen({ navigation }: LoginScreenProps) {
   return (
     <SignIn
       onNavigateToSignUp={() => setShowSignUp(true)}
-      onNavigateToHome={() => navigation.replace('Home')}
+      onNavigateToForgotPassword={() => navigation.replace('ForgotPassword')}
     />
   );
 }

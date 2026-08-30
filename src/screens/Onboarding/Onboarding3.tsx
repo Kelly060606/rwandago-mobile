@@ -93,7 +93,7 @@ const styles = StyleSheet.create({
 
   vectorImage: {
     width: '100%',
-    height: '100%',
+    height: '110%',
   },
 
   bottomCard: {

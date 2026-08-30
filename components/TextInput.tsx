@@ -21,6 +21,7 @@ export default function TextInput({ label, error, style, ...inputProps }: TextIn
       <Text style={styles.label}>{label}</Text>
       <NativeTextInput
         {...inputProps}
+        placeholderTextColor="#B7B7B7"
         style={[styles.input, error ? styles.inputError : undefined]}
       />
       {error ? <Text style={styles.error}>{error}</Text> : null}
@@ -31,18 +32,20 @@ export default function TextInput({ label, error, style, ...inputProps }: TextIn
 const styles = StyleSheet.create({
   label: {
     color: '#222',
-    fontSize: 14,
+    fontSize: 12,
     fontWeight: '600',
-    marginBottom: 6,
+    marginBottom: 7,
   },
   input: {
-    borderColor: '#D0D0D0',
-    borderRadius: 8,
+    backgroundColor: '#FAFAFA',
+    borderColor: '#BDBDBD',
+    borderRadius: 22,
     borderWidth: 1,
     color: '#222',
-    fontSize: 16,
-    paddingHorizontal: 12,
-    paddingVertical: 10,
+    fontSize: 13,
+    minHeight: 44,
+    paddingHorizontal: 16,
+    paddingVertical: 9,
   },
   inputError: {
     borderColor: '#D32F2F',

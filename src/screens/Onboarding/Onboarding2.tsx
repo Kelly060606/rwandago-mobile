@@ -1,11 +1,5 @@
 import React from 'react';
-import {
-  View,
-  Text,
-  StyleSheet,
-  TouchableOpacity,
-  Image,
-} from 'react-native';
+import {View,Text,StyleSheet,TouchableOpacity,Image,} from 'react-native';
 
 interface Onboarding2Props {
   onNext: () => void;
@@ -92,7 +86,7 @@ const styles = StyleSheet.create({
 
   vectorImage: {
     width: '100%',
-    height: '100%',
+    height: '110%',
   },
 
   bottomCard: {

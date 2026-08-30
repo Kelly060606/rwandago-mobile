@@ -6,22 +6,36 @@ import {
   TouchableOpacity,
   ScrollView,
   Image,
+  Dimensions,
 } from 'react-native';
 import TextInput from '../../../components/TextInput';
 import Button from '../../../components/Button';
+import { signInUser } from '../../services/authService';
+import { signInWithGoogle, signInWithTwitter } from '../../services/socialAuthService';
+import { useNavigation } from '@react-navigation/native';
+import { NativeStackNavigationProp } from '@react-navigation/native-stack';
+import { RootStackParamList } from '../../navigation/types';
+
+type SignInNavigationProp = NativeStackNavigationProp<RootStackParamList, "SignIn">;
 
 interface SignInProps {
   onNavigateToSignUp: () => void;
-  onNavigateToHome: () => void;
+  onNavigateToForgotPassword: () => void;
+  onNavigateToHome?: () => void;
 }
+const { height } = Dimensions.get('window');
 
-const SignIn: React.FC<SignInProps> = ({ onNavigateToSignUp, onNavigateToHome }) => {
+const SignIn: React.FC<SignInProps> = ({
+  onNavigateToSignUp,
+  onNavigateToForgotPassword,
+  onNavigateToHome,
+}) => {
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [errors, setErrors] = useState<Record<string, string>>({});
   const [loading, setLoading] = useState(false);
+  const navigation = useNavigation<SignInNavigationProp>();
 
-  // Validation
   const validateForm = (): boolean => {
     const newErrors: Record<string, string> = {};
 
@@ -39,97 +53,143 @@ const SignIn: React.FC<SignInProps> = ({ onNavigateToSignUp, onNavigateToHome })
     return Object.keys(newErrors).length === 0;
   };
 
-  // Handle Sign In
   const handleSignIn = async () => {
     if (!validateForm()) return;
-
     setLoading(true);
     try {
-      console.log('Sign In:', { email, password });
-      
-      setTimeout(() => {
-        setLoading(false);
-        onNavigateToHome();
-      }, 1500);
-    } catch (error) {
+      await signInUser(email, password);
       setLoading(false);
-      console.error('Sign in error:', error);
+      // alert('Sign In Successful!');
+      if (onNavigateToHome) {
+        onNavigateToHome();
+      } else {
+        navigation.replace('AppTabs');
+      }
+    } catch (error: any) {
+      setLoading(false);
+      setErrors({ submit: error.message });
     }
   };
 
-  // Background image - YOU CUSTOMIZE THIS
+  const handleGoogleSignIn = async () => {
+    setLoading(true);
+    try {
+      await signInWithGoogle();
+      setLoading(false);
+      alert('Google Sign In Successful!');
+    } catch (error: any) {
+      setLoading(false);
+      setErrors({ submit: 'Google sign in failed' });
+    }
+  };
+
+  const handleTwitterSignIn = async () => {
+    setLoading(true);
+    try {
+      await signInWithTwitter();
+      setLoading(false);
+      alert('Twitter Sign In Successful!');
+    } catch (error: any) {
+      setLoading(false);
+      setErrors({ submit: 'Twitter sign in failed' });
+    }
+  };
+
   const backgroundImage = require('../../../assets/gorilla.jpg');
 
   return (
     <View style={styles.container}>
-      {/* Background Image */}
+      {/* Background Image - Fixed at top */}
       <Image
         source={backgroundImage}
         style={styles.backgroundImage}
         resizeMode="cover"
       />
 
-      {/* Dark Overlay */}
+      {/* Overlay */}
       <View style={styles.overlay} />
 
-      {/* Scrollable Content */}
-      <ScrollView 
-        contentContainerStyle={styles.scrollContent}
-        showsVerticalScrollIndicator={false}
-      >
-        {/* White Card */}
-        <View style={styles.card}>
-          {/* Title */}
-          <Text style={styles.title}>Log In</Text>
+      {/* White Card at Bottom - Fixed Height */}
+      <View style={styles.cardContainer}>
+        <ScrollView 
+          scrollEnabled={false}
+          contentContainerStyle={styles.cardContent}
+          showsVerticalScrollIndicator={false}
+        >
+          <Text style={styles.title}>Sign In</Text>
+          <Text style={styles.subtitle}>Please enter a valid account</Text>
 
-          {/* Form Section */}
           <View style={styles.formSection}>
-            {/* Email Input */}
             <TextInput
               label="Email"
-              placeholder="Enter your email"
+              placeholder="you@example.com"
               value={email}
               onChangeText={setEmail}
               keyboardType="email-address"
               error={errors.email}
-              style={styles.input}
             />
 
-            {/* Password Input */}
             <TextInput
               label="Password"
-              placeholder="Enter your password"
+              placeholder="••••••••"
               value={password}
               onChangeText={setPassword}
               secureTextEntry={true}
               error={errors.password}
-              style={styles.input}
             />
+
+            <TouchableOpacity
+              style={styles.forgotContainer}
+              onPress={onNavigateToForgotPassword}
+            >
+              <Text style={styles.forgotText}>Forgot Password?</Text>
+            </TouchableOpacity>
           </View>
 
-          {/* Log In Button */}
+          {errors.submit && (
+            <Text style={styles.submitErrorText}>
+              Invalid email or password
+            </Text>
+          )}
+
           <Button
-            title="LOG IN"
+            title="Sign In"
             onPress={handleSignIn}
             loading={loading}
             fullWidth
-            style={styles.submitButton}
           />
 
-          {/* Sign Up Link */}
-          <View style={styles.signUpSection}>
-            <Text style={styles.signUpText}>
+          <View style={styles.divider}>
+            <View style={styles.line} />
+            <Text style={styles.orText}>OR</Text>
+            <View style={styles.line} />
+          </View>
+
+          <View style={styles.socialButtons}>
+            <TouchableOpacity
+              style={styles.socialButton}
+              onPress={handleGoogleSignIn}
+            >
+              <Text style={styles.googleIcon}>G</Text>
+            </TouchableOpacity>
+            <TouchableOpacity
+              style={styles.socialButton}
+              onPress={handleTwitterSignIn}
+            >
+              <Text style={styles.xIcon}>𝕏</Text>
+            </TouchableOpacity>
+          </View>
+
+          <View style={styles.linkSection}>
+            <Text style={styles.linkText}>
               Don't have account?{' '}
-              <Text
-                style={styles.signUpLink}
-                onPress={onNavigateToSignUp}
-              >
+              <Text style={styles.link} onPress={onNavigateToSignUp}>
                 Sign Up
               </Text>
             </Text>
           </View>
-        </View>
-      </ScrollView>
+        </ScrollView>
+      </View>
     </View>
   );
 };
@@ -141,60 +201,133 @@ const styles = StyleSheet.create({
   },
 
   backgroundImage: {
-    ...StyleSheet.absoluteFill,
-    height: '100%',
+    position: 'absolute',
+    top: 0,
+    left: 0,
+    right: 0,
+    height: height * 0.55,
+    width: '100%',
   },
 
   overlay: {
-    ...StyleSheet.absoluteFill,
-    backgroundColor: 'rgba(0, 0, 0, 0.4)',
-    height: '100%',
+    position: 'absolute',
+    top: 0,
+    left: 0,
+    right: 0,
+    height: height * 0.55,
+    backgroundColor: 'rgba(0, 0, 0, 0.3)',
   },
 
-  scrollContent: {
-    flexGrow: 1,
-    justifyContent: 'flex-end',
-  },
-
-  card: {
-    alignSelf: 'stretch',
+  cardContainer: {
+    position: 'absolute',
+    bottom: 0,
+    left: 0,
+    right: 0,
+    height: height * 0.78,
     backgroundColor: 'white',
     borderTopLeftRadius: 20,
     borderTopRightRadius: 20,
+  },
+
+  cardContent: {
     paddingHorizontal: 24,
     paddingTop: 24,
-    paddingBottom: 30,
+    paddingBottom: 24,
   },
 
   title: {
     fontSize: 24,
     fontWeight: 'bold',
     color: '#000',
-    marginBottom: 24,
+    marginBottom: 8,
+  },
+
+  subtitle: {
+    fontSize: 14,
+    color: '#666',
+    marginBottom: 20,
   },
 
   formSection: {
-    marginBottom: 24,
+    marginBottom: 20,
   },
 
-  input: {
+  submitErrorText: {
+    color: 'red',
+    fontSize: 12,
+    marginBottom: 12,
+    marginTop: -6,
+  },
+
+  forgotContainer: {
+    alignItems: 'flex-end',
+    marginTop: 12,
+  },
+
+  forgotText: {
+    color: '#1E88E5',
+    fontSize: 13,
+    fontWeight: '500',
+  },
+
+  divider: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    marginVertical: 16,
+  },
+
+  line: {
+    flex: 1,
+    height: 1,
+    backgroundColor: '#ddd',
+  },
+
+  orText: {
+    color: '#999',
+    fontSize: 12,
+    marginHorizontal: 12,
+  },
+
+  socialButtons: {
+    flexDirection: 'row',
+    justifyContent: 'center',
+    gap: 20,
     marginBottom: 16,
   },
 
-  submitButton: {
-    marginBottom: 24,
+  socialButton: {
+    width: 50,
+    height: 50,
+    borderRadius: 25,
+    borderWidth: 1,
+    borderColor: '#ddd',
+    justifyContent: 'center',
+    alignItems: 'center',
+    backgroundColor: 'white',
   },
 
-  signUpSection: {
+  googleIcon: {
+    fontSize: 20,
+    fontWeight: '600',
+    color: '#4285F4',
+  },
+
+  xIcon: {
+    fontSize: 20,
+    fontWeight: '600',
+    color: '#000',
+  },
+
+  linkSection: {
     alignItems: 'center',
   },
 
-  signUpText: {
+  linkText: {
     color: '#666',
-    fontSize: 14,
+    fontSize: 13,
   },
 
-  signUpLink: {
+  link: {
     color: '#1E88E5',
     fontWeight: '600',
   },
